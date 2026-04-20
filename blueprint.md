@@ -1,26 +1,24 @@
 # Day 13 Observability Lab Report
 
-> **Instruction**: Fill in all sections below. This report is designed to be parsed by an automated grading assistant. Ensure all tags (e.g., `[GROUP_NAME]`) are preserved.
-
 ## 1. Team Metadata
 
-- [GROUP_NAME]: C401-X4
-- [REPO_URL]: https://github.com/thiennguyen37-qn/NhomX4-401-Day13.git
+- [GROUP_NAME]: C401-X4 ;
+- [REPO_URL]: https://github.com/thiennguyen37-qn/NhomX4-401-Day13.git ;
 - [MEMBERS]:
-  - Member 1: Võ Thanh Chung | Role: Logging & PII
-  - Member 2: Đỗ Thế Anh | Role: Tracing & Enrichment
-  - Member 3: Nguyễn Hồ Bảo Thiên | Role: SLO & Alerts
-  - Member 4: Dương Khoa Điềm | Role: Load Test & Dashboard
-  - Member 5: Lê Minh Khang | Role: Demo & Report
-  - Member 6: Hoàng Thị Thanh Tuyền | Role: Demo & Report
+  - Member 1: Võ Thanh Chung | Role: Logging, PII Redaction, Metrics, Langfuse Tracing Integration
+  - Member 2: Đỗ Thế Anh | Role: streamlit_app.py owner, tạo mock data request đến APIs
+  - Member 3: Nguyễn Hồ Bảo Thiên | Role: SLOs and Alerts
+  - Member 4: Dương Khoa Điềm | Role: Testing, Monitoring, Dashboard Verification
+  - Member 5: Lê Bảo Khang | Role: Dashboard and Observability Enhancement
+  - Member 6: Hoàng Thị Thanh Tuyền | Role: update Runbook, tổng hợp report
 
 ---
 
 ## 2. Group Performance (Auto-Verified)
 
-- [VALIDATE_LOGS_FINAL_SCORE]: N/A (chua co file/artifact validator trong repo de suy ra diem /100)
-- [TOTAL_TRACES_COUNT]: 26 (theo bo loc Tracing trong evidence screenshot ngay 2026-04-20)
-- [PII_LEAKS_FOUND]: 0 (kiem tra log `logs/2026-04-20.log` thay `patient_id` da duoc redaction thanh `[PATIENT_ID]`)
+- [VALIDATE_LOGS_FINAL_SCORE]: 80/100 ;
+- [TOTAL_TRACES_COUNT]: 37 ;
+- [PII_LEAKS_FOUND]: 0 ;
 
 ---
 
@@ -28,25 +26,25 @@
 
 ### 3.1 Logging & Tracing
 
-- [EVIDENCE_CORRELATION_ID_SCREENSHOT]:
-- [EVIDENCE_PII_REDACTION_SCREENSHOT]:
-- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]:
+- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: ![Correlation ID Screenshot](docs/screenshots/correlation_id.png)
+- [EVIDENCE_PII_REDACTION_SCREENSHOT]: ![PII Redaction Screenshot](docs/screenshots/pii_redaction.jpg)
+- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: ![Trace Waterfall Screenshot](docs/screenshots/grafana-dashboard.jpg)
 - [TRACE_WATERFALL_EXPLANATION]: Trong waterfall, span đáng chú ý là chuỗi child span `explain-HBA1C` -> `explain-LDL` -> `explain-GLUCOSE_F` dưới `lumina-workflow`. Ở khoảng `2026-04-20 22:17:08` đến `22:17:51`, các span `explain-*` lên `Level = ERROR`, cho thấy lỗi xảy ra khi gọi LLM để sinh diễn giải cho từng xét nghiệm. Tuy vậy span cha `lumina-workflow` vẫn kết thúc thành công (đối chiếu log `logs/2026-04-20.log:4`, `correlation_id=f11e2e76-89ff-4b57-8aa7-71167f700d5c`, `error=null`) vì `explain_node` có cơ chế fallback deterministic khi LLM lỗi. Insight chính: hệ thống đang có tính chịu lỗi tốt ở mức workflow, nhưng cần giám sát riêng error-rate của span `explain-*` để phát hiện sớm suy giảm chất lượng trả lời.
 
 ### 3.2 Dashboard & SLOs
 
-- [DASHBOARD_6_PANELS_SCREENSHOT]:
+- [DASHBOARD_6_PANELS_SCREENSHOT]: ![Dashboard 6 Panels](docs/screenshots/grafana-dashboard.jpg)
 - [SLO_TABLE]:
   | SLI | Target | Window | Current Value |
   |---|---:|---|---:|
-  | Latency P95 | < 3000ms | 28d | 24535ms |
-  | Error Rate | < 2% | 28d | 0.00% |
-  | Cost Budget | < $2.5/day | 1d | $0.2502/day |
+  | Latency P95 | < 3000ms | 28d | 9680ms |
+  | Error Rate | < 2% | 28d | 8.1% |
+  | Cost Budget | < $2.5/day | 1d | $0.2590/day |
 
 ### 3.3 Alerts & Runbook
 
-- [ALERT_RULES_SCREENSHOT]:
-- [SAMPLE_RUNBOOK_LINK]: `high_latency -> docs/runbooks/high-latency; high_error_rate -> docs/runbooks/high-error-rate; cost_budget -> docs/runbooks/cost-budget; hallucination_proxy -> docs/runbooks/hallucination-proxy`
+- [ALERT_RULES_SCREENSHOT]: ![Alert Rules Screenshot](docs/screenshots/alerts.jpg)
+- [SAMPLE_RUNBOOK_LINK]: [high_latency](docs/runbooks/high-latency.md); [high_error_rate](docs/runbooks/high-error-rate.md); [cost_budget](docs/runbooks/cost-budget.md); [hallucination_proxy](docs/runbooks/hallucination-proxy.md)
 
 ---
 
@@ -54,7 +52,7 @@
 
 - [SCENARIO_NAME]: `llm_tool_span_error_but_workflow_survives`
 - [SYMPTOMS_OBSERVED]:
-  - Trên Tracing, các span `explain-HBA1C`, `explain-LDL`, `explain-GLUCOSE_F` xuất hiện `Level = ERROR` (khung thời gian khoảng `2026-04-20 22:17:08` đến `22:17:51`).
+- Trên Tracing, các span `explain-HBA1C`, `explain-LDL`, `explain-GLUCOSE_F` xuất hiện `Level = ERROR` (khung thời gian khoảng `2026-04-20 22:17:08` đến `22:17:51`).
   - Tuy nhiên `lumina-workflow` vẫn hoàn tất (không crash toàn luồng), người dùng vẫn nhận phản hồi nhưng chất lượng có lúc giảm (ví dụ câu trả lời xin lỗi/chung chung).
 - [ROOT_CAUSE_PROVED_BY]:
   - **Trace evidence**: nhiều child span `explain-*` bị `ERROR` trong cùng phiên chạy, cho thấy lỗi xảy ra tại bước gọi LLM để giải thích từng chỉ số.
@@ -72,34 +70,34 @@
 
 ## 5. Individual Contributions & Evidence
 
-### Vo Thanh Chung
+### Võ Thanh Chung
 
 - [TASKS_COMPLETED]: Logging/PII redaction, metrics va Langfuse tracing integration.
-- [EVIDENCE_LINK]: https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/53bc88a ;
+- [EVIDENCE_LINK]: [Commit 53bc88a](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/53bc88a)
 
-### Do The Anh
+### Đỗ Thế Anh
 
-- [TASKS_COMPLETED]: Tracing enrichment, thiet ke/cap nhat app flow va deploy config.
-- [EVIDENCE_LINK]: https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/6049b53 ;
+- [TASKS_COMPLETED]: Tracing enrichment, thiết kế UI app cho phép người dùng chỉnh sửa json body request đến APIs (để cố tình tạo lỗi, mock data test). Cho phép stress test trong khoảng được thiết lập. Cập nhật đến live dashboard
+- [EVIDENCE_LINK]: [Commit 6049b53](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/6049b53)
 
-### Nguyen Ho Bao Thien
+### Nguyễn Hồ Bảo Thiên
 
 - [TASKS_COMPLETED]: Đóng góp cho SLO và Alerts flow.
 - [EVIDENCE_LINK]:
 
-### Duong Khoa Diem
+### Dương Khoa Điềm
 
 - [TASKS_COMPLETED]: Testing, monitoring, theo dõi dashboard
 - [EVIDENCE_LINK]:
 
-### Le Minh Khang
+### Lê Bảo Khang
 
 - [TASKS_COMPLETED]: Dashboard/observability enhancement
-- [EVIDENCE_LINK]: https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/e195a62 ; https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/e195a6250d325ff57314b6901bc89c95ad4364cf
+- [EVIDENCE_LINK]: [Commit e195a62](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/e195a62)
 
-### Hoang Thi Thanh Tuyen
+### Hoàng Thị Thanh Tuyền
 
 - [TASKS_COMPLETED]: Runbook/hallucination updates, prototype va demo/report support.
-- [EVIDENCE_LINK]: https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/47056e9411e7928b9e8a22ccc5e020c9faf82fe2; https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/8e4ee94;
+- [EVIDENCE_LINK]: [Commit 8e4ee94](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/8e4ee94)
 
 ---
