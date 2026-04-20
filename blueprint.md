@@ -78,12 +78,12 @@
 ### Đỗ Thế Anh
 
 - [TASKS_COMPLETED]: Tracing enrichment, thiết kế UI app cho phép người dùng chỉnh sửa json body request đến APIs (để cố tình tạo lỗi, mock data test). Cho phép stress test trong khoảng được thiết lập. Cập nhật đến live dashboard
-- [EVIDENCE_LINK]: [Commit 6049b53](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/6049b53)
+- [EVIDENCE_LINK]: [Commit 6049b53] (https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/6049b53)
 
 ### Nguyễn Hồ Bảo Thiên
 
-- [TASKS_COMPLETED]: Đóng góp cho SLO và Alerts flow.
-- [EVIDENCE_LINK]:
+- [TASKS_COMPLETED]: Đóng góp cho SLO và Alerts flow, config và trace Langfuse.
+- [EVIDENCE_LINK]: [Commit cf41ba0](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/cf41ba06b021cdb1d78b4e4e7edcce04ba2f798f)
 
 ### Dương Khoa Điềm
 
