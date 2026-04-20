@@ -88,7 +88,7 @@
 ### Dương Khoa Điềm
 
 - [TASKS_COMPLETED]: Testing, monitoring, theo dõi dashboard
-- [EVIDENCE_LINK]:
+- [EVIDENCE_LINK]: [Commit bd4b4 ](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/b0e9b4ad8ce0edb4374ba5550e848e35308bd4b4) ; [Commit 8a4fff ](https://github.com/thiennguyen37-qn/NhomX4-401-Day13/commit/5e9f24ff766b6161321700725116babcee8a4fff)
 
 ### Lê Bảo Khang
 
